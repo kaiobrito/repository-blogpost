@@ -5,3 +5,7 @@ type Todo struct {
 	Name string `json:"name"`
 	Done bool   `json:"done"`
 }
+
+func (t Todo) GetID() string {
+	return t.ID
+}
