@@ -6,12 +6,12 @@ import (
 )
 
 type App struct {
-	Todos []data.Todo
+	Todos map[string]*data.Todo
 }
 
 func main() {
 	app := App{
-		Todos: []data.Todo{},
+		Todos: map[string]*data.Todo{},
 	}
 
 	r := setupRouter(&app)

@@ -7,23 +7,26 @@ import (
 	"github.com/kaiobrito/repository-blogpost/data"
 )
 
+type Response[T any] struct {
+	Data []T `json:"data"`
+}
+
 func (app *App) GetTodos(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, app.Todos)
+	var resp Response[*data.Todo]
+	resp.Data = []*data.Todo{}
+	for _, todo := range app.Todos {
+		resp.Data = append(resp.Data, todo)
+	}
+
+	ctx.JSON(http.StatusOK, resp)
 }
 
 func (app *App) GetTodoById(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	var existingTodo data.Todo
+	existingTodo := app.Todos[id]
 
-	for _, todo := range app.Todos {
-		if id == todo.ID {
-			existingTodo = todo
-			break
-		}
-	}
-
-	if existingTodo.ID == "" {
+	if existingTodo == nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, map[string]string{
 			"error": "Not found",
 		})
@@ -35,16 +38,9 @@ func (app *App) GetTodoById(ctx *gin.Context) {
 func (app *App) EditTodos(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	var existingTodo data.Todo
+	existingTodo := app.Todos[id]
 
-	for _, todo := range app.Todos {
-		if id == todo.ID {
-			existingTodo = todo
-			break
-		}
-	}
-
-	if existingTodo.ID == "" {
+	if existingTodo == nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, map[string]string{
 			"error": "Not found",
 		})
@@ -53,14 +49,17 @@ func (app *App) EditTodos(ctx *gin.Context) {
 
 	var todo data.Todo
 	err := ctx.BindJSON(&todo)
+
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, map[string]string{
 			"error": err.Error(),
 		})
 		return
 	}
-	app.Todos = append(app.Todos, todo)
-	ctx.JSON(http.StatusOK, app.Todos)
+
+	todo.ID = id
+	app.Todos[id] = &todo
+	ctx.JSON(http.StatusOK, todo)
 }
 
 func (app *App) CreateTodos(ctx *gin.Context) {
@@ -72,6 +71,6 @@ func (app *App) CreateTodos(ctx *gin.Context) {
 		})
 		return
 	}
-	app.Todos = append(app.Todos, todo)
-	ctx.JSON(http.StatusOK, app.Todos)
+	app.Todos[todo.ID] = &todo
+	ctx.JSON(http.StatusOK, todo)
 }
