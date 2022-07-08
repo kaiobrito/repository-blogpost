@@ -13,7 +13,6 @@ import (
 
 var (
 	PORT    = 50051
-
 )
 
 
