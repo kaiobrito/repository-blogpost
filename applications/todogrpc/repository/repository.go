@@ -16,7 +16,7 @@ type TodoGRPCService struct {
 
 func toDataTodo(todo *proto.Todo) *data.Todo {
 	return &data.Todo{
-		ID: todo.Id,
+		ID:   todo.Id,
 		Name: todo.Name,
 		Done: todo.Done,
 	}
@@ -24,7 +24,7 @@ func toDataTodo(todo *proto.Todo) *data.Todo {
 
 func toProtoTodo(todo data.Todo) *proto.Todo {
 	return &proto.Todo{
-		Id: todo.ID,
+		Id:   todo.ID,
 		Name: todo.Name,
 		Done: todo.Done,
 	}
@@ -48,7 +48,7 @@ func (s *TodoGRPCService) GetAll(ctx context.Context) ([]*data.Todo, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	results := []*data.Todo{}
 	for {
 		todo, err := service.Recv()
@@ -57,7 +57,7 @@ func (s *TodoGRPCService) GetAll(ctx context.Context) ([]*data.Todo, error) {
 		}
 		if err != nil {
 			return nil, err
-		  }
+		}
 		results = append(results, toDataTodo(todo))
 	}
 }
@@ -69,7 +69,7 @@ func (s TodoGRPCService) GetById(ctx context.Context, id string) (*data.Todo, er
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return toDataTodo(todo), nil
 }
 

@@ -17,13 +17,13 @@ func (app *App) GetTodos(ctx *gin.Context) {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, map[string]string{
 			"error": err.Error(),
 		})
-		return 
+		return
 	}
 
-	resp := Response[*data.Todo] {
+	resp := Response[*data.Todo]{
 		Data: todos,
 	}
-	
+
 	ctx.JSON(http.StatusOK, resp)
 }
 
@@ -64,7 +64,7 @@ func (app *App) EditTodos(ctx *gin.Context) {
 	}
 
 	todo.ID = id
-	app.Repo.Save(ctx.Request.Context(),todo)
+	app.Repo.Save(ctx.Request.Context(), todo)
 	ctx.JSON(http.StatusOK, todo)
 }
 

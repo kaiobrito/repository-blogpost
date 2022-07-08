@@ -12,11 +12,10 @@ import (
 )
 
 var (
-	PORT    = 50051
+	PORT = 50051
 )
 
-
-func main(){
+func main() {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", PORT))
 	if err != nil {
 		panic(err)

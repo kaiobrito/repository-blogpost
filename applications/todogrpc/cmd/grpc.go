@@ -9,17 +9,15 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-
 type server struct {
 	proto.UnimplementedTodoServiceServer
 
 	Repo repository.IRepository[data.Todo]
 }
 
-
 func toDataTodo(todo *proto.Todo) *data.Todo {
 	return &data.Todo{
-		ID: todo.Id,
+		ID:   todo.Id,
 		Name: todo.Name,
 		Done: todo.Done,
 	}
@@ -27,7 +25,7 @@ func toDataTodo(todo *proto.Todo) *data.Todo {
 
 func toProtoTodo(todo data.Todo) *proto.Todo {
 	return &proto.Todo{
-		Id: todo.ID,
+		Id:   todo.ID,
 		Name: todo.Name,
 		Done: todo.Done,
 	}
