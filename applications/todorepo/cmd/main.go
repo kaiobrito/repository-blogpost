@@ -2,11 +2,11 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
+	gRepo "github.com/kaiobrito/repository-blogpost/applications/todogrpc/repository"
 	"github.com/kaiobrito/repository-blogpost/data"
 	"github.com/kaiobrito/repository-blogpost/data/repository"
 	"github.com/kaiobrito/repository-blogpost/external/todoapi"
@@ -18,7 +18,7 @@ type App struct {
 
 func main() {
 	app := App{
-		Repo: createTODOAPIRepository(),
+		Repo: createRepository(),
 	}
 
 	r := setupRouter(&app)
@@ -34,27 +34,21 @@ func setupRouter(app *App) *gin.Engine {
 
 	return r
 }
-
-func createTODOAPIRepository() repository.IRepository[data.Todo] {
-	username := flag.String("username", "", "Username used to authenticate at Todo api")
-	password := flag.String("password", "", "Password used to authenticate at Todo api")
-	token := flag.String("token", "", "Token used to authenticate at Todo api")
+func createRepository() repository.IRepository[data.Todo] {
+	repo := flag.String("repository", "", "Type of repository that will be used")
 	flag.Parse()
 
-	fmt.Println(token, username, password)
-
-	if *token != "" {
-		log.Println("Creating Repository with token")
-		return todoapi.CreateTODOAPIRepositoryWithToken(*token)
+	if *repo == "api" {
+		log.Println("Using API Repository")
+		return createTODOAPIRepositoryFromEnv()
+	} else if *repo == "grpc" {
+		log.Println("Using GRPC Repository")
+		return gRepo.CreateTodoGRPCService("localhost:50051")
 	}
 
-	if *username != "" && *password != "" {
-		log.Println("Creating Repository with username and password")
-		return todoapi.CreateTODOAPIRepository(*username, *password)
-	}
-
-	log.Println("Creating Repository from env variable")
-	return createTODOAPIRepositoryFromEnv()
+	log.Println("Using memory Repository")
+	initialData := []data.Todo{}
+	return repository.CreateMemoryRepository(initialData)
 }
 
 func createTODOAPIRepositoryFromEnv() repository.IRepository[data.Todo] {
