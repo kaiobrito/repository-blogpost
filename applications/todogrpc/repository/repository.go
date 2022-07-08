@@ -8,6 +8,7 @@ import (
 	"github.com/kaiobrito/repository-blogpost/data"
 	"github.com/kaiobrito/repository-blogpost/data/repository"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type TodoGRPCService struct {
@@ -44,7 +45,7 @@ func CreateTodoGRPCService(uri string) repository.IRepository[data.Todo] {
 }
 
 func (s *TodoGRPCService) GetAll(ctx context.Context) ([]*data.Todo, error) {
-	service, err := s.client.GetAll(ctx, nil)
+	service, err := s.client.GetAll(ctx, &emptypb.Empty{})
 	if err != nil {
 		return nil, err
 	}
