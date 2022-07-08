@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,6 +13,7 @@ type Response[T any] struct {
 }
 
 func (app *App) GetTodos(ctx *gin.Context) {
+	log.Println("GetTodos")
 	todos, err := app.Repo.GetAll(ctx.Request.Context())
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, map[string]string{
@@ -29,6 +31,7 @@ func (app *App) GetTodos(ctx *gin.Context) {
 
 func (app *App) GetTodoById(ctx *gin.Context) {
 	id := ctx.Param("id")
+	log.Println("GetTodoById: " + id)
 
 	existingTodo, err := app.Repo.GetById(ctx.Request.Context(), id)
 
@@ -43,6 +46,7 @@ func (app *App) GetTodoById(ctx *gin.Context) {
 
 func (app *App) EditTodos(ctx *gin.Context) {
 	id := ctx.Param("id")
+	log.Println("EditTodos: " + id)
 
 	_, err := app.Repo.GetById(ctx.Request.Context(), id)
 
@@ -69,6 +73,7 @@ func (app *App) EditTodos(ctx *gin.Context) {
 }
 
 func (app *App) CreateTodos(ctx *gin.Context) {
+	log.Println("CreateTodos")
 	var todo data.Todo
 	err := ctx.BindJSON(&todo)
 
