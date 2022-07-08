@@ -1,9 +1,12 @@
 package main
 
 import (
+	"flag"
+
 	"github.com/gin-gonic/gin"
 	"github.com/kaiobrito/repository-blogpost/data"
 	"github.com/kaiobrito/repository-blogpost/data/repository"
+	"github.com/kaiobrito/repository-blogpost/external/todoapi"
 )
 
 type App struct {
@@ -11,9 +14,8 @@ type App struct {
 }
 
 func main() {
-	initialData := []data.Todo{}
 	app := App{
-		Repo: repository.CreateMemoryRepository(initialData),
+		Repo: createTODOAPIRepository(),
 	}
 
 	r := setupRouter(&app)
@@ -28,4 +30,12 @@ func setupRouter(app *App) *gin.Engine {
 	r.POST("todos/", app.CreateTodos)
 
 	return r
+}
+
+func createTODOAPIRepository() repository.IRepository[data.Todo] {
+	username := flag.String("username", "", "Username used to authenticate at Todo api")
+	password := flag.String("password", "", "Password used to authenticate at Todo api")
+	flag.Parse()
+
+	return todoapi.CreateTODOAPIRepository(*username, *password)
 }
