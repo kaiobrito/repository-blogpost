@@ -43,8 +43,8 @@ func CreateTodoGRPCService(uri string) repository.IRepository[data.Todo] {
 	}
 }
 
-func (s *TodoGRPCService) GetAll() ([]*data.Todo, error) {
-	service, err := s.client.GetAll(context.TODO(), nil)
+func (s *TodoGRPCService) GetAll(ctx context.Context) ([]*data.Todo, error) {
+	service, err := s.client.GetAll(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -62,8 +62,8 @@ func (s *TodoGRPCService) GetAll() ([]*data.Todo, error) {
 	}
 }
 
-func (s TodoGRPCService) GetById(id string) (*data.Todo, error) {
-	todo, err := s.client.GetById(context.TODO(), &proto.TodoFilters{
+func (s TodoGRPCService) GetById(ctx context.Context, id string) (*data.Todo, error) {
+	todo, err := s.client.GetById(ctx, &proto.TodoFilters{
 		Id: id,
 	})
 	if err != nil {
@@ -73,12 +73,12 @@ func (s TodoGRPCService) GetById(id string) (*data.Todo, error) {
 	return toDataTodo(todo), nil
 }
 
-func (s TodoGRPCService) Create(todo data.Todo) error {
-	_, err := s.client.Create(context.TODO(), toProtoTodo(todo))
+func (s TodoGRPCService) Create(ctx context.Context, todo data.Todo) error {
+	_, err := s.client.Create(ctx, toProtoTodo(todo))
 	return err
 }
 
-func (s TodoGRPCService) Save(todo data.Todo) error {
-	_, err := s.client.Update(context.TODO(), toProtoTodo(todo))
+func (s TodoGRPCService) Save(ctx context.Context, todo data.Todo) error {
+	_, err := s.client.Update(ctx, toProtoTodo(todo))
 	return err
 }

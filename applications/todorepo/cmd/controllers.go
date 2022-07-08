@@ -12,7 +12,7 @@ type Response[T any] struct {
 }
 
 func (app *App) GetTodos(ctx *gin.Context) {
-	todos, err := app.Repo.GetAll()
+	todos, err := app.Repo.GetAll(ctx.Request.Context())
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, map[string]string{
 			"error": err.Error(),
@@ -30,7 +30,7 @@ func (app *App) GetTodos(ctx *gin.Context) {
 func (app *App) GetTodoById(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	existingTodo, err := app.Repo.GetById(id)
+	existingTodo, err := app.Repo.GetById(ctx.Request.Context(), id)
 
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, map[string]string{
@@ -44,7 +44,7 @@ func (app *App) GetTodoById(ctx *gin.Context) {
 func (app *App) EditTodos(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	_, err := app.Repo.GetById(id)
+	_, err := app.Repo.GetById(ctx.Request.Context(), id)
 
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, map[string]string{
@@ -64,7 +64,7 @@ func (app *App) EditTodos(ctx *gin.Context) {
 	}
 
 	todo.ID = id
-	app.Repo.Save(todo)
+	app.Repo.Save(ctx.Request.Context(),todo)
 	ctx.JSON(http.StatusOK, todo)
 }
 
@@ -78,6 +78,6 @@ func (app *App) CreateTodos(ctx *gin.Context) {
 		})
 		return
 	}
-	app.Repo.Create(todo)
+	app.Repo.Create(ctx.Request.Context(), todo)
 	ctx.JSON(http.StatusOK, todo)
 }

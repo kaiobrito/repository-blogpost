@@ -1,12 +1,14 @@
 package repository
 
+import "context"
+
 type Identifiable interface {
 	GetID() string
 }
 
 type IRepository[Model Identifiable] interface {
-	GetAll() ([]*Model, error)
-	GetById(string) (*Model, error)
-	Create(Model) error
-	Save(Model) error
+	GetAll(context.Context) ([]*Model, error)
+	GetById(context.Context, string) (*Model, error)
+	Create(context.Context, Model) error
+	Save(context.Context, Model) error
 }
