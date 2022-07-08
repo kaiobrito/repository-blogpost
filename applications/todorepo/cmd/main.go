@@ -13,7 +13,7 @@ type App struct {
 func main() {
 	initialData := []data.Todo{}
 	app := App{
-		Repo: repository.CreateMemoryRepository[data.Todo](initialData),
+		Repo: repository.CreateMemoryRepository(initialData),
 	}
 
 	r := setupRouter(&app)
