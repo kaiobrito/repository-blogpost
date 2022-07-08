@@ -31,6 +31,13 @@ func CreateTODOAPIRepository(username string, password string) repository.IRepos
 		Token: token,
 	}
 }
+
+func CreateTODOAPIRepositoryWithToken(token string) repository.IRepository[data.Todo] {
+	return TodoAPIRepository{
+		Token: token,
+	}
+}
+
 func login(username string, password string) (string, error) {
 	payload := apiLogin{
 		Email:    username,
@@ -42,7 +49,8 @@ func login(username string, password string) (string, error) {
 		return "", err
 	}
 
-	token, err := requestAndMarshall[apiLoginResponse]("user/login", http.MethodPost, bytes.NewBuffer(data), nil)
+	var token apiLoginResponse
+	err = request("user/login", http.MethodPost, bytes.NewBuffer(data), nil, &token)
 	if err != nil {
 		return "", err
 	}
@@ -57,7 +65,8 @@ func (r TodoAPIRepository) getHeaders() map[string]string {
 }
 
 func (r TodoAPIRepository) GetAll(context.Context) ([]*data.Todo, error) {
-	todos, err := requestAndMarshall[apiResponse[apiTodo]]("task", http.MethodGet, nil, r.getHeaders())
+	var todos apiResponse[[]apiTodo]
+	err := request("task", http.MethodGet, nil, r.getHeaders(), &todos)
 	if err != nil {
 		return nil, err
 	}
@@ -75,15 +84,17 @@ func (r TodoAPIRepository) GetAll(context.Context) ([]*data.Todo, error) {
 }
 
 func (r TodoAPIRepository) GetById(_ context.Context, id string) (*data.Todo, error) {
-	todo, err := requestAndMarshall[apiTodo]("task/"+id, http.MethodGet, nil, r.getHeaders())
+	var res apiResponse[apiTodo]
+	err := request("task/"+id, http.MethodGet, nil, r.getHeaders(), &res)
+
 	if err != nil {
 		return nil, err
 	}
 
 	return &data.Todo{
-		ID:   todo.ID,
-		Name: todo.Name,
-		Done: todo.Done,
+		ID:   res.Data.ID,
+		Name: res.Data.Name,
+		Done: res.Data.Done,
 	}, err
 }
 
@@ -98,15 +109,25 @@ func (r TodoAPIRepository) Create(_ context.Context, todo data.Todo) error {
 		return err
 	}
 
-	res, err := requestAndMarshall[apiTodo]("task/", http.MethodPost, bytes.NewBuffer(body), r.getHeaders())
-	todo = data.Todo{
-		ID:   res.ID,
-		Name: res.Name,
-		Done: res.Done,
-	}
+	var res apiTodo
+	err = request("task/", http.MethodPost, bytes.NewBuffer(body), r.getHeaders(), &res)
+	todo.ID = res.ID
+	todo.Name = res.Name
+	todo.Done = res.Done
+
 	return err
 }
 
-func (r TodoAPIRepository) Save(context.Context, data.Todo) error {
-	return nil
+func (r TodoAPIRepository) Save(_ context.Context, todo data.Todo) error {
+	payload := apiTodo{
+		Name: todo.Name,
+		Done: todo.Done,
+	}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+
+	err = request[apiTodo]("task/"+todo.ID, http.MethodPut, bytes.NewBuffer(body), r.getHeaders(), nil)
+	return err
 }

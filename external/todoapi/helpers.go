@@ -38,14 +38,11 @@ func sendRequest(path string, method string, body io.Reader, headers *map[string
 	return ioutil.ReadAll(res.Body)
 }
 
-func requestAndMarshall[Response any](path string, method string, body io.Reader, headers map[string]string) (*Response, error) {
+func request[Response any](path string, method string, body io.Reader, headers map[string]string, r *Response) error {
 	res, err := sendRequest(path, method, body, &headers)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	var r Response
-	err = json.Unmarshal(res, &r)
-
-	return &r, err
+	return json.Unmarshal(res, &r)
 }

@@ -10,7 +10,7 @@ type apiLoginResponse struct {
 }
 
 type apiResponse[T any] struct {
-	Data []T `json:"data"`
+	Data T `json:"data"`
 }
 
 type apiTodo struct {
