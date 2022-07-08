@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func sendRequest(path string, method string, body io.Reader, headers map[string]string) ([]byte, error) {
+func sendRequest(path string, method string, body io.Reader, headers *map[string]string) ([]byte, error) {
 	client := http.Client{
 		Timeout: time.Second * 5,
 	}
@@ -21,7 +21,7 @@ func sendRequest(path string, method string, body io.Reader, headers map[string]
 	}
 	req.Header.Add("Content-Type", "application/json")
 	if headers != nil {
-		for key, value := range headers {
+		for key, value := range *headers {
 			req.Header.Add(key, value)
 		}
 	}
@@ -39,7 +39,7 @@ func sendRequest(path string, method string, body io.Reader, headers map[string]
 }
 
 func requestAndMarshall[Response any](path string, method string, body io.Reader, headers map[string]string) (*Response, error) {
-	res, err := sendRequest(path, method, body, headers)
+	res, err := sendRequest(path, method, body, &headers)
 	if err != nil {
 		return nil, err
 	}
