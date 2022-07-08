@@ -7,6 +7,7 @@ import (
 	"github.com/kaiobrito/repository-blogpost/applications/todogrpc/proto"
 	"github.com/kaiobrito/repository-blogpost/data"
 	"github.com/kaiobrito/repository-blogpost/data/repository"
+	"google.golang.org/grpc"
 )
 
 type TodoGRPCService struct {
@@ -29,9 +30,16 @@ func toProtoTodo(todo data.Todo) *proto.Todo {
 	}
 }
 
-func CreateTodoGRPCService(c *proto.TodoServiceClient) repository.IRepository[data.Todo] {
+func CreateTodoGRPCService(uri string) repository.IRepository[data.Todo] {
+	conn, err := grpc.Dial(uri, grpc.WithInsecure())
+	if err != nil {
+		panic(err)
+	}
+
+	client := proto.NewTodoServiceClient(conn)
+
 	return &TodoGRPCService{
-		client: *c,
+		client: client,
 	}
 }
 
