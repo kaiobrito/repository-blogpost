@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/kaiobrito/repository-blogpost/todogrpc/proto";
+
+message Todo {
+    string id = 1;
+    string name = 2;
+    bool done = 3;
+}
+
+message TodoFilters {
+    string id = 1;
+}
+
+service TodoService {
+    rpc GetAll(google.protobuf.Empty) returns (stream Todo) {}
+    rpc GetById(TodoFilters) returns (Todo) {}
+    rpc Create(Todo) returns (Todo) {}
+    rpc Update(Todo) returns (Todo) {}
+}
