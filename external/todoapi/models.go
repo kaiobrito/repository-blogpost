@@ -14,7 +14,7 @@ type apiResponse[T any] struct {
 }
 
 type apiTodo struct {
-	ID   string `json:"_id"`
+	ID   string `json:"_id,omitempty"`
 	Name string `json:"description"`
 	Done bool   `json:"completed"`
 }

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/kaiobrito/repository-blogpost/data"
@@ -84,12 +85,35 @@ func (r TodoAPIRepository) GetAll(context.Context) ([]*data.Todo, error) {
 	return results, err
 }
 
-func (r TodoAPIRepository) GetById(context.Context, string) (*data.Todo, error) {
-	return nil, nil
+func (r TodoAPIRepository) GetById(_ context.Context, id string) (*data.Todo, error) {
+	res, err := sendRequest("task/"+id, http.MethodGet, nil, r.getHeaders())
+	if err != nil {
+		return nil, err
+	}
+	var todo apiTodo
+	err = json.Unmarshal(res, &todo)
+
+	return &data.Todo{
+		ID:   todo.ID,
+		Name: todo.Name,
+		Done: todo.Done,
+	}, err
 }
 
-func (r TodoAPIRepository) Create(context.Context, data.Todo) error {
-	return nil
+func (r TodoAPIRepository) Create(_ context.Context, todo data.Todo) error {
+	payload := apiTodo{
+		ID:   "",
+		Name: todo.Name,
+		Done: todo.Done,
+	}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+
+	res, err := sendRequest("task/", http.MethodPost, bytes.NewBuffer(body), r.getHeaders())
+	fmt.Println(string(res))
+	return err
 }
 
 func (r TodoAPIRepository) Save(context.Context, data.Todo) error {
